@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css2?family=Exo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Sustainable Aviation Indicators</title>
+    <style>
+        /* --- VISUAL STYLE --- */
+        :root {
+            --primary: #0284c7;       /* Sky Blue */
+            --primary-dark: #0369a1;  /* Deep Sky Blue */
+            --secondary: #38bdf8;     /* Bright Cloud Blue */
+            --accent: #e0f2fe;        /* Pale Mist Blue */
+            --glass: rgba(255, 255, 255, 0.90);
+            --glass-border: rgba(255, 255, 255, 0.8);
+            --text-main: #0f172a;
+            --text-light: #f8fafc;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Exo', system-ui, sans-serif; }
+
+        /* 1. The Sky (Base Layer) */
+        body {
+            background: linear-gradient(-45deg, #0ea5e9, #38bdf8, #bae6fd, #7dd3fc);
+            background-size: 400% 400%;
+            animation: skyShift 20s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-main);
+            padding-bottom: 80px; 
+            position: relative; /* Helps contain our cloud sticker */
+        }
+
+        /* 2. The Clouds (The moving sticker) */
+        body::before {
+            content: "";
+            position: fixed; /* Locks it to the screen */
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* A seamless cloud image often used by web designers */
+            background: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1518/clouds.png');
+            background-size: 800px; /* Makes the clouds big and fluffy */
+            opacity: 0.5; /* Makes them slightly see-through and soft */
+            z-index: -1; /* Pushes the sticker BEHIND your cards */
+            pointer-events: none; /* Ensures you can still click the cards through the clouds */
+            animation: windBlow 60s linear infinite; /* 60 seconds = slow, relaxing wind */
+        }
+
+        /* 3. The Animations (The Engine) */
+        @keyframes skyShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes windBlow {
+            from { background-position: 0px 0px; }
+            to { background-position: 800px 0px; } /* Slides the image exactly one width over */
+        }
+
+        /* --- HAMBURGER MENU & SIDEBAR FILTERS --- */
+        .hamburger-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: var(--glass);
+            color: var(--primary-dark);
+            border: 1px solid var(--glass-border);
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s;
+        }
+        .hamburger-btn:hover { background: white; transform: scale(1.05); }
+
+        #filter-sidebar {
+            position: fixed;
+            top: 0; left: -320px;
+            width: 300px; height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            box-shadow: 4px 0 25px rgba(0,0,0,0.2);
+            z-index: 2000;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            padding: 20px;
+            color: var(--text-main);
+        }
+        #filter-sidebar.open { left: 0; }
+        
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        .sidebar-header h2 { font-size: 1.5rem; color: var(--primary-dark); }
+        .close-sidebar-btn { background: none; border: none; font-size: 2rem; cursor: pointer; color: #64748b; line-height: 1; margin-top: -5px; }
+        
+        .filter-section { margin-bottom: 20px; }
+        .filter-section h3 { font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 10px; background: var(--accent); padding: 5px 10px; border-radius: 6px; }
+        
+        .checkbox-label { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85rem; cursor: pointer; color: #334155; }
+        .checkbox-label input { margin-right: 10px; cursor: pointer; accent-color: var(--primary); width: 15px; height: 15px; }
+
+        /* Toggle Switches */
+        .switch-wrapper { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 0.9rem; font-weight: 600; color: var(--primary-dark); padding: 10px; background: rgba(56, 189, 248, 0.1); border-radius: 8px;}
+        .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(18px); }
+
+        /* Sidebar Scrollbar */
+        #filter-sidebar::-webkit-scrollbar { width: 6px; }
+        #filter-sidebar::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+        .top-logo {
+            position: absolute;
+            top: 0px;
+            right: 30px;
+            width: 120px;
+            height: auto;
+            z-index: 100;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+            opacity: 0.9;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        
+        @media (max-width: 600px) {
+            .top-logo { width: 80px; top: 15px; right: 15px; }
+            .hamburger-btn { top: 15px; left: 15px; padding: 8px 12px; font-size: 0.9rem; }
+            .header h1 { font-size: 1.8rem; padding-top: 30px; }
+        }
+
+        .header { max-width: 1200px; margin: 0 auto 30px auto; text-align: center; padding-top: 20px; }
+        h1 { color: black; font-size: 2.2rem; margin-bottom: 20px; text-shadow: 0 4px 12px rgba(0,0,0,0.3); letter-spacing: -0.5px; }
+        .subtitle { 
+            color: rgba(0, 0, 0, 0.9); 
+            font-size: 1.1rem; 
+            margin-top: -10px; 
+            margin-bottom: 25px; 
+            font-weight: 600; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+        }
+        
+        .search-wrapper { position: relative; max-width: 600px; margin: 0 auto; }
+        .search-input { width: 100%; padding: 16px 24px; border-radius: 50px; border: none; font-size: 1rem; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.2); transition: transform 0.2s; }
+        .search-input:focus { outline: 3px solid var(--secondary); transform: scale(1.02); }
+
+        .card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; padding-bottom: 50px; }
+
+        /* --- CARD DESIGN --- */
+        .card { 
+            position: relative;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            display: flex; 
+            flex-direction: column;
+            padding: 25px;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: auto;
+            min-height: 400px;
+            z-index: 1;
+        }
+
+        .card:hover:not(.expanded) {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        /* --- SELECTION CHECKBOX --- */
+        .select-checkbox {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
+            background: white;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .card.selected { border: 2px solid var(--primary); }
+        .card.selected .select-checkbox { background: var(--primary); border-color: var(--primary); }
+        .checkmark { color: white; font-size: 14px; opacity: 0; transform: scale(0.5); transition: all 0.2s; }
+        .card.selected .checkmark { opacity: 1; transform: scale(1); }
+
+        /* --- FLOATING COMPARE BUTTON --- */
+        #compare-fab {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(150px);
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            box-shadow: 0 10px 30px rgba(234, 88, 12, 0.5), 0 0 0 3px rgba(255, 255, 255, 0.8);
+            cursor: pointer;
+            z-index: 2000;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        #compare-fab.visible { animation: popAndBounce 2s infinite; }
+        #compare-fab:hover { background: linear-gradient(135deg, #ea580c, #c2410c); transform: translateX(-50%) scale(1.05); animation: none; }
+        @keyframes popAndBounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-12px); }
+            60% { transform: translateX(-50%) translateY(-6px); }
+        }
+
+        /* --- EXPANDED STATE --- */
+        .card.expanded {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            width: 90%;
+            max-width: 700px;
+            height: 85vh; 
+            z-index: 1000;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border: 2px solid var(--secondary);
+            overflow-y: auto; 
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* --- COMPARISON MODAL --- */
+        #compare-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            width: 95%;
+            height: 90vh;
+            background: #f8fafc;
+            z-index: 2500;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        #compare-modal.active { opacity: 1; pointer-events: all; transform: translate(-50%, -50%) scale(1); }
+
+        .compare-header { padding: 20px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 200; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .compare-header h2 { font-size: 1.5rem; color: var(--text-main); }
+        .compare-content { flex-grow: 1; overflow: auto; padding: 0; position: relative; z-index: 1; }
+
+        .compare-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 600px; }
+        .compare-table th, .compare-table td { padding: 15px; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; vertical-align: top; font-size: 0.9rem; line-height: 1.5; color: #334155; word-wrap: break-word; }
+        .compare-table td { background: #ffffff; position: relative; z-index: 1; background-clip: padding-box; }
+        .compare-table tbody th { position: sticky; left: 0; background: #f1f5f9; text-align: left; width: 150px; font-weight: 700; color: var(--primary-dark); z-index: 10; border-right: 2px solid #cbd5e1; box-shadow: 2px 0 5px rgba(0,0,0,0.05); }
+        .compare-table thead th { position: sticky; top: 0; background: var(--primary); color: white; z-index: 20; border: 1px solid var(--primary-dark); border-bottom: 2px solid var(--primary-dark); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .compare-table thead th:first-child { left: 0; z-index: 30; border-right: 2px solid var(--primary-dark); }
+        .compare-icon { font-size: 1.5rem; margin-bottom: 5px; display: block; }
+        .compare-card-title { font-weight: 800; font-size: 1rem; color: white; }
+        .compare-table td ul { padding-left: 25px; margin: 5px 0; }
+
+        .card.expanded::-webkit-scrollbar, .compare-content::-webkit-scrollbar { width: 8px; height: 8px; }
+        .card.expanded::-webkit-scrollbar-track, .compare-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; }
+        .card.expanded::-webkit-scrollbar-thumb, .compare-content::-webkit-scrollbar-thumb { background: var(--secondary); border-radius: 10px; }
+
+        #backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        #backdrop.active { opacity: 1; pointer-events: all; }
+        #backdrop.super-active { z-index: 2200; opacity: 1; pointer-events: all; }
+
+        /* Common Elements */
+        .icon-wrapper { width: 50px; height: 50px; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; }
+        .card-title { font-size: 1.3rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 10px; line-height: 1.2; padding-right: 30px; }
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+        .tag { font-size: 0.7rem; padding: 4px 8px; background: rgba(46, 125, 50, 0.1); color: var(--primary); border-radius: 6px; font-weight: 600; }
+        .unit-box { background: white; padding: 12px; border-radius: 10px; border-left: 4px solid var(--secondary); margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .unit-label { font-size: 0.65rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+        .unit-value { font-size: 0.9rem; font-weight: 600; color: var(--text-main); margin-top: 4px; }
+        .definition { font-size: 0.9rem; line-height: 1.5; color: #475569; margin-bottom: 20px; }
+
+        .action-btn { margin-top: auto; text-align: center; padding: 12px; background: var(--primary); color: white; border-radius: 10px; font-size: 0.9rem; font-weight: 600; transition: background 0.2s; cursor: pointer; border: none; width: 100%; }
+        .action-btn:hover { background: var(--primary-dark); }
+        .action-btn.close { background: #ef4444; margin-top: 20px; display: none; margin-bottom: 10px; }
+        .card.expanded .action-btn.view { display: none; }
+        .card.expanded .action-btn.close { display: block; }
+
+        .details-container { max-height: 0; overflow: hidden; opacity: 0; transition: all 0.5s ease; }
+        .card.expanded .details-container { max-height: none; overflow: visible; opacity: 1; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.1); }
+
+        .data-section-title { font-size: 1.1rem; font-weight: 700; color: var(--primary-dark); margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .acc-item { margin-bottom: 8px; border-radius: 8px; background: rgba(46, 125, 50, 0.05); overflow: visible; border: 1px solid rgba(46, 125, 50, 0.1); }
+        .acc-header { padding: 12px 15px; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--primary-dark); display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .acc-header:hover { background: rgba(46, 125, 50, 0.1); }
+        .acc-header::after { content: '+'; font-size: 1.2rem; color: var(--secondary); }
+        .acc-item.active .acc-header::after { content: '−'; }
+        .acc-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; background: white; }
+        .acc-inner { padding: 15px; font-size: 0.9rem; line-height: 1.5; color: #334155; }
+        .acc-inner ul { padding-left: 20px; margin: 0; } 
+        .acc-inner li { margin-bottom: 5px; }
+        .acc-inner a { color: var(--primary); font-weight: 600; text-decoration: none; }
+        .acc-inner a:hover { text-decoration: underline; }
+
+        /* --- TOOLTIP STYLES --- */
+        .tooltip { position: relative; display: inline-block; cursor: help; color: var(--secondary); margin-left: 5px; font-weight: bold; border-radius: 50%; border: 1px solid var(--secondary); width: 18px; height: 18px; text-align: center; line-height: 16px; font-size: 12px; }
+        .tooltip .tooltiptext { visibility: hidden; width: 250px; background-color: var(--primary-dark); color: #fff; text-align: center; border-radius: 6px; padding: 10px; position: absolute; z-index: 10; bottom: 125%; left: 50%; margin-left: -125px; opacity: 0; transition: opacity 0.3s; font-size: 0.8rem; font-weight: normal; box-shadow: 0 4px 6px rgba(0,0,0,0.3); white-space: normal; }
+        .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: var(--primary-dark) transparent transparent transparent; }
+        .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div id="backdrop" onclick="closeAllOverlays()"></div>
+    
+    <button class="hamburger-btn" onclick="toggleSidebar()">☰ Filters</button>
+
+    <div id="filter-sidebar">
+        <div class="sidebar-header">
+            <h2>Refine Data</h2>
+            <button class="close-sidebar-btn" onclick="toggleSidebar()">×</button>
+        </div>
+
+        <div class="switch-wrapper">
+            <span>Measures specifically efficiency</span>
+            <label class="switch">
+                <input type="checkbox" id="filter-efficiency" onchange="applyFilters()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="switch-wrapper">
+            <span>Measures energy/fuel usage</span>
+            <label class="switch">
+                <input type="checkbox" id="filter-energy" onchange="applyFilters()">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="filter-section">
+            <h3>User Segment</h3>
+            <label class="checkbox-label"><input type="checkbox" name="segment" value="Airlines" onchange="applyFilters()"> Airlines</label>
+            <label class="checkbox-label"><input type="checkbox" name="segment" value="Airports" onchange="applyFilters()"> Airports</label>
+            <label class="checkbox-label"><input type="checkbox" name="segment" value="Lessors" onchange="applyFilters()"> Lessors</label>
+        </div>
+
+        <div class="filter-section">
+            <h3>EU Taxonomy Activity</h3>
+            <label class="checkbox-label"><input type="checkbox" name="taxonomy" value="6.18" onchange="applyFilters()"> 6.18 Leasing of aircraft</label>
+            <label class="checkbox-label"><input type="checkbox" name="taxonomy" value="6.19" onchange="applyFilters()"> 6.19 Passenger & Freight air transport</label>
+            <label class="checkbox-label"><input type="checkbox" name="taxonomy" value="6.20" onchange="applyFilters()"> 6.20 Air transport ground handling</label>
+            <label class="checkbox-label"><input type="checkbox" name="taxonomy" value="6.17" onchange="applyFilters()"> 6.17 Low carbon airport infrastructure</label>
+        </div>
+
+        <div class="filter-section">
+            <h3>Objectives</h3>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Climate mitigation" onchange="applyFilters()"> Climate mitigation</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Regulatory compliance" onchange="applyFilters()"> Regulatory compliance</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="System monitoring" onchange="applyFilters()"> System monitoring</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Climate efficiency" onchange="applyFilters()"> Climate efficiency</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Performance benchmarking" onchange="applyFilters()"> Performance benchmarking</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Project appraisal" onchange="applyFilters()"> Project appraisal</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Investment justification" onchange="applyFilters()"> Investment justification</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Technological advancement" onchange="applyFilters()"> Technological advancement</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Strategic planning" onchange="applyFilters()"> Strategic planning</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Cost reduction" onchange="applyFilters()"> Cost reduction</label>
+            <label class="checkbox-label"><input type="checkbox" name="objective" value="Infrastructure deployment" onchange="applyFilters()"> Infrastructure deployment</label>
+        </div>
+
+        <div class="filter-section">
+            <h3>Key Drivers</h3>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Infrastructure size" onchange="applyFilters()"> Infrastructure size</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Passenger throughput" onchange="applyFilters()"> Passenger throughput</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Climate conditions" onchange="applyFilters()"> Climate conditions</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Capital availability" onchange="applyFilters()"> Capital availability</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Fleet renewal strategy" onchange="applyFilters()"> Fleet renewal strategy</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Market demand" onchange="applyFilters()"> Market demand</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="System improvements" onchange="applyFilters()"> System improvements</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Carbon offsetting" onchange="applyFilters()"> Carbon offsetting</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Technology advancement" onchange="applyFilters()"> Technology advancement</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Fuel consumption" onchange="applyFilters()"> Fuel consumption</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Aircraft type" onchange="applyFilters()"> Aircraft type</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Fuel type" onchange="applyFilters()"> Fuel type</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Flight operations" onchange="applyFilters()"> Flight operations</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Distance" onchange="applyFilters()"> Distance</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Traffic volume" onchange="applyFilters()"> Traffic volume</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Policy incentives" onchange="applyFilters()"> Policy incentives</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Feedstock availability" onchange="applyFilters()"> Feedstock availability</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="SAF cost" onchange="applyFilters()"> SAF cost</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Supply chain maturity" onchange="applyFilters()"> Supply chain maturity</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Load factor" onchange="applyFilters()"> Load factor</label>
+            <label class="checkbox-label"><input type="checkbox" name="driver" value="Aircraft utilisation" onchange="applyFilters()"> Aircraft utilisation</label>
+        </div>
+    </div>
+    <img src="https://i.postimg.cc/C1ZxMNVZ/eurocontrol-boxed-rgb.jpg" alt="Eurocontrol Logo" class="top-logo">
+
+    <div class="header">
+        <h1>TrackAIR</h1>
+        <p class="subtitle">FlyingGreen Intelligence - Performance tracking embedded into financing sustainable aviation</p>
+        <div class="search-wrapper">
+            <input type="text" id="search" class="search-input" placeholder="Search data sources, drivers, taxonomy...">
+        </div>
+    </div>
+
+    <div class="card-container" id="app"></div>
+
+    <div id="compare-fab" onclick="openComparison()">
+        <span>Compare Cards (<span id="compare-count">0</span>)</span>
+    </div>
+
+    <div id="compare-modal">
+        <div class="compare-header">
+            <h2>Detailed Comparison</h2>
+            <button class="action-btn" style="width: auto; background: #ef4444; margin: 0;" onclick="closeAllOverlays()">Close</button>
+        </div>
+        <div class="compare-content" id="compare-table-container">
+            </div>
+    </div>
+
+    <script>
+        /* ================================================================
+           DATA
+           ================================================================
+        */
+        const indicators = [
+            {
+                icon: "co2_emissions_absolute.svg",
+                title: "CO2 Emissions Absolute",
+                front: { unit: "Metric tons of CO2 (tCO2)", stakeholders: ["Airlines", "Airports", "Lessors"], definition: "Total carbon dioxide (CO2) emissions generated by aviation activity over a defined period. Includes fuel combustion during flight operations." },
+                back: [
+                    { title: "Data Sources", content: "<ul><li>Fuel uplift data</li><li>Fuel burn models</li><li>Flight movement data</li><li>Aircraft performance databases</li><li>Emission factors inventories</li></ul>" },
+                    { title: "Calculation Logic", content: "Fuel consumption multiplied by a standard emission factor (typically ~3.16 kg CO2 per kg of jet fuel), aggregated over the defined period." },
+                    { title: "Objective(s)", content: "<ul><li>Climate mitigation</li><li>Regulatory compliance</li><li>System monitoring</li></ul>" },
+                    { title: "Key Drivers", content: "<ul><li>Fuel consumption</li><li>Aircraft type</li><li>Fuel type</li><li>Flight operations</li><li>Distance</li><li>Traffic volume</li></ul>" },
+                    { title: "Constraints", content: "<ul><li>Penalises air traffic growth</li><li>Technology constraints</li><li>Policy constraints</li><li>Not suitable for benchmarking diverse business models</li></ul>" },
+                    { title: "EU Taxonomy", content: "<ul><li>6.18 Leasing of aircraft</li><li>3.21 Aircraft manufacturing</li><li>6.19 Passenger & Freight air transport</li><li>6.20 Ground handling</li><li>6.17 Low carbon airport infrastructure</li></ul>" },
+                    { title: "Interpretation", content: "Must be interpreted together with activity metrics. Please check boundaries of the system to account for proper emissions reporting (LTO vs. cruise)." },
+                    { title: "Actual Use Case", content: "<a href='https://flying-green.eurocontrol.int/#/decarb-fin/use-case-detailed-view?useCaseId=80a14b25-0e4a-45ee-bfb5-7207c4d07b2a' target='_blank'>Eurocontrol Use Case 1</a>" }
+                ]
+            },
+            {
+                icon: "co2_intensity.svg",
+                title: "CO2 Intensity",
+                front: { unit: "Metric tones of CO2 per Available Seat-Kilometer (ASK)", stakeholders: ["Airlines"], definition: "CO2 emissions relative to transport output (available seat kilometers offered). Measures efficiency rather than total impact." },
+                back: [
+                    { title: "Data Sources", content: "<ul><li>CO2 emissions data</li><li>Aircraft performance databases</li><li>Passenger traffic statistics</li></ul>" },
+                    { title: "Calculation Logic", content: "Absolute CO2 emissions divided by (Available Seats × Flight Distance)." },
+                    { title: "Objective(s)", content: "<ul><li>Climate efficiency</li><li>Performance benchmarking</li></ul>" },
+                    { title: "Key Drivers", content: "<ul><li>Aircraft type</li><li>Distance</li><li>Load factor</li><li>Aircraft utilisation</li></ul>" },
+                    { title: "Constraints", content: "<ul><li>Ignores load factor</li><li>Route-length distortion</li><li>Not ideal for benchmarking diverse models</li></ul>" },
+                    { title: "EU Taxonomy", content: "<ul><li>6.19 Passenger & Freight air transport</li></ul>" },
+                    { title: "Interpretation", content: "<ul><li>Use for efficiency trends, not total climate impact</li><li>Ensure consistent denominator (ASK vs RPK)</li></ul>" },
+                    { title: "<span>Actual Use Case <span class='tooltip'>i<span class='tooltiptext'>There is no known use case for the indicator CO2/ASK. The use case below describes a relevant intensity indicator CO2/RPK.</span></span></span>", content: "<a href='https://flying-green.eurocontrol.int/#/decarb-fin/use-case-detailed-view?useCaseId=5addbd7b-49a5-45e3-a5dc-413bbb34ac6a' target='_blank'>Eurocontrol CO2/RPK</a>" }
+                ]
+            },
+            {
+                icon: "saf_uptake.svg",
+                title: "SAF Uptake",
+                front: { unit: "Share (%) of SAF volume / Total Fuel volume", stakeholders: ["Airlines"], definition: "Share of Sustainable Aviation Fuel (SAF) used relative to total aviation fuel consumption over a defined period." },
+                back: [
+                    { title: "Data Sources", content: "<ul><li>Fuel purchase records</li><li>Sustainability certificates</li><li>Supplier reporting</li></ul>" },
+                    { title: "Calculation Logic", content: "Certified SAF volume divided by total fuel uplift for the same scope and period." },
+                    { title: "Objective(s)", content: "<ul><li>Climate mitigation</li><li>Regulatory compliance</li></ul>" },
+                    { title: "Key Drivers", content: "<ul><li>Policy incentives</li><li>Feedstock availability</li><li>SAF cost</li><li>Supply chain maturity</li></ul>" },
+                    { title: "Constraints", content: "<ul><li>Market price</li><li>Lack of certification</li><li>Risk of double-counting</li></ul>" },
+                    { title: "EU Taxonomy", content: "<ul><li>6.19 Passenger & Freight air transport</li></ul>" },
+                    { title: "Interpretation", content: "<ul><li>Interpret as a transition signal</li><li>Depends on accounting method (physical vs book-and-claim)</li></ul>" },
+                    { title: "Actual Use Case", content: "<a href='https://dialogue.earth/en/digest/chinas-first-transition-finance-taxonomy-launches/' target='_blank'>China's Transition Taxonomy</a>" }
+                ]
+            },
+            {
+                icon: "co2_emissions_avoided.svg",
+                title: "CO2 Emissions Avoided",
+                front: { unit: "Metric tons of CO2 (tCO2)", stakeholders: ["Airlines", "Airports"], definition: "Estimated reduction in CO2 emissions compared to a baseline scenario by replacing a high-emission option with a lower one." },
+                back: [
+                    { title: "Data Sources", content: "<ul><li>Systemic CO2 data</li><li>Project-specific data</li><li>Baseline assumptions</li></ul>" },
+                    { title: "Calculation Logic", content: "Difference between baseline emissions and emissions under the project scenario." },
+                    { title: "Objective(s)", content: "<ul><li>Climate mitigation</li><li>Project appraisal</li><li>Investment justification</li></ul>" },
+                    { title: "Key Drivers", content: "<ul><li>System improvements</li><li>Carbon offsetting</li><li>Technology advancement</li></ul>" },
+                    { title: "Constraints", content: "<ul><li>Impact uncertainty</li><li>Sensitive to assumptions</li><li>Not suited for comparability</li></ul>" },
+                    { title: "EU Taxonomy", content: "<ul><li>6.19 Passenger & Freight air transport</li><li>6.20 Air transport ground handling operations</li><li>6.17 Low carbon airport infrastructure</li></ul>" },
+                    { title: "Interpretation", content: "Only meaningful if baseline and assumptions are transparent." },
+                    { title: "Actual Use Case", content: "<a href='https://www.hongkongairport.com/iwov-resources/file/sustainability/environment/sustainable-finance/AAHK_Sustainable_Finance_Transactions_Annual_Report.pdf' target='_blank'>HK Airport Finance Report</a>" }
+                ]
+            },
+            {
+                icon: "number_of_new_gen_aircraft.svg",
+                title: "New-Gen Aircraft",
+                front: { unit: "Share (%) of total operational Fleet", stakeholders: ["Airlines", "Lessors"], definition: "Proportion of an airline fleet composed of new-generation aircraft types with improved fuel efficiency." },
+                back: [
+                    { title: "Data Sources", content: "<ul><li>Fleet registries</li><li>Manufacturer data</li><li>Airline disclosures</li></ul>" },
+                    { title: "Calculation Logic", content: "Number of delivered new-gen aircraft divided by total operational fleet size." },
+                    { title: "Objective(s)", content: "<ul><li>Climate mitigation</li><li>Technological advancement</li><li>Strategic planning</li></ul>" },
+                    { title: "Key Drivers", content: "<ul><li>Capital availability</li><li>Fleet renewal strategy</li><li>Market demand</li></ul>" },
+                    { title: "Constraints", content: "<ul><li>Investment costs</li><li>Supply chain frictions</li><li>Ignores utilisation</li></ul>" },
+                    { title: "EU Taxonomy", content: "<ul><li>6.19 Passenger & Freight air transport</li><li>6.18 Leasing of aircraft</li></ul>" },
+                    { title: "Interpretation", content: "<ul><li>Only to be used as a proxy for efficiency monitoring</li><li>Definition of 'new-generation' aircraft is required (which type of aircraft fall under the 'new-generation' category</li></ul>" },
+                    { title: "Actual Use Case", content: "<a href='https://www.koreanair.com/contents/footer/about-us/newsroom/list/korean-air-to-issue-environmental--social-and-governance-bonds' target='_blank'>Korean Air ESG Bond</a>" }
+                ]
+            },
+            {
+                icon: "energy_use_airports.svg",
+                title: "Energy Use (Airports)",
+                front: { unit: "Total Energy (GJ) or Electricity (kWh) consumption", stakeholders: ["Airports"], definition: "Total energy consumed by airport infrastructure and ground operations over a defined period." },
+                back: [
+                    { title: "Data Sources", content: "<ul><li>Utility bills</li><li>Energy management systems</li><li>Operational data</li></ul>" },
+                    { title: "Calculation Logic", content: "Sum of energy (electricity, fuel, etc.) consumption across airport facilities." },
+                    { title: "Objective(s)", content: "<ul><li>Climate mitigation</li><li>Cost reduction</li><li>Infrastructure deployment</li></ul>" },
+                    { title: "Key Drivers", content: "<ul><li>Infrastructure size</li><li>Passenger throughput</li><li>Climate conditions</li></ul>" },
+                    { title: "Constraints", content: "<ul><li>Investment costs</li><li>Capacity constraints</li><li>Unclear reporting boundaries</li></ul>" },
+                    { title: "EU Taxonomy", content: "<ul><li>6.20 Air transport ground handling operations</li><li>6.17 Low carbon airport infrastructure</li></ul>" },
+                    { title: "Interpretation", content: "<ul><li>Requires clear system boundaries</li><li>Normalise (per passenger/m²) for comparability</li></ul>"},
+                    { title: "Actual Use Case", content: "<a href='https://flying-green.eurocontrol.int/#/decarb-fin/use-case-detailed-view?useCaseId=db9caf89-05ef-4650-8258-19feaea184ed' target='_blank'>Eurocontrol Use Case</a>" }
+                ]
+            }
+        ];
+
+        const container = document.getElementById('app');
+        const searchInput = document.getElementById('search');
+        const backdrop = document.getElementById('backdrop');
+        const fab = document.getElementById('compare-fab');
+        const compareModal = document.getElementById('compare-modal');
+        const compareCount = document.getElementById('compare-count');
+        const compareContainer = document.getElementById('compare-table-container');
+
+        let selectedIndices = new Set();
+
+        // --- SIDEBAR MENU LOGIC ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('filter-sidebar');
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                backdrop.classList.remove('active');
+            } else {
+                sidebar.classList.add('open');
+                backdrop.classList.add('active');
+            }
+        }
+
+        // --- MASTER FILTER LOGIC ---
+        function applyFilters() {
+            const searchText = searchInput.value.toLowerCase();
+            
+            // Get states of switches
+            const reqEfficiency = document.getElementById('filter-efficiency').checked;
+            const reqEnergy = document.getElementById('filter-energy').checked;
+
+            // Get checked boxes
+            const checkedSegments = Array.from(document.querySelectorAll('input[name="segment"]:checked')).map(cb => cb.value);
+            const checkedTaxonomy = Array.from(document.querySelectorAll('input[name="taxonomy"]:checked')).map(cb => cb.value);
+            const checkedObjectives = Array.from(document.querySelectorAll('input[name="objective"]:checked')).map(cb => cb.value);
+            const checkedDrivers = Array.from(document.querySelectorAll('input[name="driver"]:checked')).map(cb => cb.value);
+
+            container.innerHTML = '';
+            
+            const filtered = indicators.filter((item, index) => {
+                item.originalIndex = index;
+                
+                // 1. Search Bar match
+                const backText = item.back.map(b => b.title + ' ' + b.content).join(' ');
+                const fullText = (item.title + ' ' + item.front.definition + ' ' + backText).toLowerCase();
+                if (searchText && !fullText.includes(searchText)) return false;
+
+                // 2. Efficiency Switch
+                if (reqEfficiency) {
+                    if (item.title !== "CO2 Intensity" && item.title !== "New-Gen Aircraft") return false;
+                }
+
+                // 3. Energy Switch
+                if (reqEnergy) {
+                    if (item.title !== "SAF Uptake" && item.title !== "Energy Use (Airports)") return false;
+                }
+
+                // 4. User Segments (Stakeholders)
+                if (checkedSegments.length > 0) {
+                    const hasSegment = checkedSegments.some(seg => item.front.stakeholders.includes(seg));
+                    if (!hasSegment) return false;
+                }
+
+                // 5. EU Taxonomy (reads text in EU Taxonomy back section)
+                if (checkedTaxonomy.length > 0) {
+                    const taxSection = item.back.find(b => b.title === 'EU Taxonomy');
+                    const taxContent = taxSection ? taxSection.content : '';
+                    const hasTax = checkedTaxonomy.some(tax => taxContent.includes(tax));
+                    if (!hasTax) return false;
+                }
+
+                // 6. Objectives (reads text in Objectives back section)
+                if (checkedObjectives.length > 0) {
+                    const objSection = item.back.find(b => b.title === 'Objective(s)');
+                    const objContent = objSection ? objSection.content : '';
+                    const hasObj = checkedObjectives.some(obj => objContent.includes(obj));
+                    if (!hasObj) return false;
+                }
+
+                // 7. Key Drivers (reads text in Key Drivers back section)
+                if (checkedDrivers.length > 0) {
+                    const drvSection = item.back.find(b => b.title === 'Key Drivers');
+                    const drvContent = drvSection ? drvSection.content : '';
+                    const hasDrv = checkedDrivers.some(drv => drvContent.includes(drv));
+                    if (!hasDrv) return false;
+                }
+
+                return true;
+            });
+
+            // Draw Cards
+            filtered.forEach((item) => {
+                const index = item.originalIndex; 
+                const isSelected = selectedIndices.has(index);
+
+                const card = document.createElement('div');
+                card.className = `card ${isSelected ? 'selected' : ''}`;
+                card.id = `card-${index}`;
+                
+                const accordionHTML = item.back.map(section => `
+                    <div class="acc-item">
+                        <div class="acc-header" onclick="toggleAccordion(event, this)">${section.title}</div>
+                        <div class="acc-content">
+                            <div class="acc-inner">${section.content}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                card.innerHTML = `
+                    <div class="select-checkbox" title="Click and select cards to compare" onclick="toggleSelection(event, ${index})">
+                        <div class="checkmark">✔</div>
+                    </div>
+                    
+                    <div class="icon-wrapper"><img src="${item.icon}" style="width: 50px; height: 50px; object-fit: contain;"></div>
+                    <div class="card-title">${item.title}</div>
+                    
+                    <div class="tags">
+                        ${item.front.stakeholders.map(s => `<span class="tag">${s}</span>`).join('')}
+                    </div>
+                    
+                    <div class="unit-box">
+                        <div class="unit-label">Unit of Measurement</div>
+                        <div class="unit-value">${item.front.unit}</div>
+                    </div>
+                    
+                    <div class="definition">${item.front.definition}</div>
+                    
+                    <button class="action-btn view" onclick="expandCard('${index}')">View Full Details &rarr;</button>
+                    
+                    <div class="details-container">
+                        <div class="data-section-title">📊 Detailed Breakdown</div>
+                        ${accordionHTML}
+                    </div>
+
+                    <button class="action-btn close" onclick="closeAllOverlays()">Close Details &#x2715;</button>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        // Hook up search bar to the new master filter function
+        searchInput.addEventListener('input', applyFilters);
+
+        // --- SELECTION LOGIC ---
+        window.toggleSelection = function(e, index) {
+            e.stopPropagation(); 
+            
+            if (selectedIndices.has(index)) {
+                selectedIndices.delete(index);
+                document.getElementById(`card-${index}`).classList.remove('selected');
+            } else {
+                selectedIndices.add(index);
+                document.getElementById(`card-${index}`).classList.add('selected');
+            }
+            updateFab();
+        };
+
+        function updateFab() {
+            compareCount.innerText = selectedIndices.size;
+            if (selectedIndices.size > 0) {
+                fab.classList.add('visible');
+            } else {
+                fab.classList.remove('visible');
+            }
+        }
+
+        // --- COMPARE LOGIC ---
+        window.openComparison = function() {
+            if (selectedIndices.size === 0) return;
+
+            const selectedItems = Array.from(selectedIndices).map(i => indicators[i]);
+
+            let tableHTML = '<table class="compare-table"><thead><tr>';
+            
+            // Corner Cell
+            tableHTML += '<th>Metric</th>';
+            // Top Headers
+            selectedItems.forEach(item => {
+                tableHTML += `<th>
+                    <span class="compare-icon"><img src="${item.icon}" style="width: 30px; height: 30px; object-fit: contain;"></span>
+                    <span class="compare-card-title">${item.title}</span>
+                </th>`;
+            });
+            tableHTML += '</tr></thead><tbody>';
+
+            // Fixed Rows
+            tableHTML += '<tr><th>Definition</th>';
+            selectedItems.forEach(item => tableHTML += `<td>${item.front.definition}</td>`);
+            tableHTML += '</tr>';
+
+            tableHTML += '<tr><th>Unit</th>';
+            selectedItems.forEach(item => tableHTML += `<td><b>${item.front.unit}</b></td>`);
+            tableHTML += '</tr>';
+
+            tableHTML += '<tr><th>Stakeholders</th>';
+            selectedItems.forEach(item => tableHTML += `<td>${item.front.stakeholders.join(', ')}</td>`);
+            tableHTML += '</tr>';
+
+            // Dynamic Rows
+            if (selectedItems.length > 0 && selectedItems[0].back) {
+                selectedItems[0].back.forEach((section, sIndex) => {
+                    tableHTML += `<tr><th>${section.title}</th>`;
+                    selectedItems.forEach(item => {
+                        const matchingSection = item.back.find(b => b.title === section.title) || item.back[sIndex];
+                        tableHTML += `<td>${matchingSection ? matchingSection.content : '-'}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                });
+            }
+
+            tableHTML += '</tbody></table>';
+            
+            compareContainer.innerHTML = tableHTML;
+            compareModal.classList.add('active');
+            backdrop.classList.add('super-active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        // --- EXPANSION LOGIC ---
+        window.expandCard = function(index) {
+            closeAllOverlays();
+            const card = document.getElementById(`card-${index}`);
+            card.classList.add('expanded');
+            backdrop.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            card.scrollTop = 0;
+        }
+
+        window.closeAllOverlays = function() {
+            // Close cards
+            const expanded = document.querySelectorAll('.card.expanded');
+            expanded.forEach(c => {
+                c.classList.remove('expanded');
+                const activeAcc = c.querySelectorAll('.acc-item.active');
+                activeAcc.forEach(acc => {
+                    acc.classList.remove('active');
+                    acc.querySelector('.acc-content').style.maxHeight = null;
+                });
+            });
+
+            // Close Compare
+            compareModal.classList.remove('active');
+            
+            // Close Sidebar
+            document.getElementById('filter-sidebar').classList.remove('open');
+            
+            backdrop.classList.remove('active');
+            backdrop.classList.remove('super-active');
+            document.body.style.overflow = ''; 
+        }
+
+        window.toggleAccordion = function(e, header) {
+            e.stopPropagation(); 
+            const item = header.parentElement;
+            const content = item.querySelector('.acc-content');
+            item.classList.toggle('active');
+            if (item.classList.contains('active')) {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                content.style.maxHeight = null;
+            }
+        };
+
+        // Initial render
+        applyFilters();
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === "Escape") {
+                closeAllOverlays();
+            }
+        });
+
+    </script>
+</body>
+</html>
