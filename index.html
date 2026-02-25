@@ -337,6 +337,16 @@
         .tooltip .tooltiptext { visibility: hidden; width: 250px; background-color: var(--primary-dark); color: #fff; text-align: center; border-radius: 6px; padding: 10px; position: absolute; z-index: 10; bottom: 125%; left: 50%; margin-left: -125px; opacity: 0; transition: opacity 0.3s; font-size: 0.8rem; font-weight: normal; box-shadow: 0 4px 6px rgba(0,0,0,0.3); white-space: normal; }
         .tooltip .tooltiptext::after { content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px; border-width: 5px; border-style: solid; border-color: var(--primary-dark) transparent transparent transparent; }
         .tooltip:hover .tooltiptext { visibility: visible; opacity: 1; }
+
+        /* Fix for Sidebar Tooltips getting chopped */
+        #filter-sidebar .tooltip .tooltiptext {
+            margin-left: -150px; /* Pushes the cloud safely to the left */
+            width: 230px; /* Makes it fit perfectly inside the sidebar */
+        }
+        
+        #filter-sidebar .tooltip .tooltiptext::after {
+            left: 150px; /* Moves the little arrow back to the right so it still points at the 'i' */
+        }
     </style>
 </head>
 <body>
@@ -457,7 +467,7 @@
                     { title: "Constraints", content: "<ul><li>Market price</li><li>Lack of certification</li><li>Risk of double-counting</li></ul>" },
                     { title: "EU Taxonomy", content: "<ul><li>6.19 Passenger & Freight air transport</li></ul>" },
                     { title: "Interpretation", content: "<ul><li>Interpret as a transition signal</li><li>Depends on accounting method (physical vs book-and-claim)</li></ul>" },
-                    { title: "Actual Use Case", content: "<a href='https://dialogue.earth/en/digest/chinas-first-transition-finance-taxonomy-launches/' target='_blank'>China's Transition Taxonomy</a>" }
+                    { title: "Actual Use Case", content: "<a href=' https://www.airfranceklm.com/en/newsroom/air-france-klm-air-france-and-klm-signed-two-revolving-credit-facilities-linked-esg-kpis' target='_blank'>Air France – KLM – Airlines</a>" }
                 ]
             },
             {
@@ -472,7 +482,7 @@
                     { title: "Constraints", content: "<ul><li>Impact uncertainty</li><li>Sensitive to assumptions</li><li>Not suited for comparability</li></ul>" },
                     { title: "EU Taxonomy", content: "<ul><li>6.19 Passenger & Freight air transport</li><li>6.20 Air transport ground handling operations</li><li>6.17 Low carbon airport infrastructure</li></ul>" },
                     { title: "Interpretation", content: "Only meaningful if baseline and assumptions are transparent." },
-                    { title: "Actual Use Case", content: "<a href='https://www.hongkongairport.com/iwov-resources/file/sustainability/environment/sustainable-finance/AAHK_Sustainable_Finance_Transactions_Annual_Report.pdf' target='_blank'>HK Airport Finance Report</a>" }
+                    { title: "Actual Use Case", content: "<a href='https://www.swedavia.se/contentassets/bd07f2866a574a9686838112de34579d/ramverk-gron-finansiering-pa-engelska-2026.pdf' target='_blank'>Swedavia – Airports</a>" }
                 ]
             },
             {
@@ -487,7 +497,7 @@
                     { title: "Constraints", content: "<ul><li>Investment costs</li><li>Supply chain frictions</li><li>Ignores utilisation</li></ul>" },
                     { title: "EU Taxonomy", content: "<ul><li>6.19 Passenger & Freight air transport</li><li>6.18 Leasing of aircraft</li></ul>" },
                     { title: "Interpretation", content: "<ul><li>Only to be used as a proxy for efficiency monitoring</li><li>Definition of 'new-generation' aircraft is required (which type of aircraft fall under the 'new-generation' category</li></ul>" },
-                    { title: "Actual Use Case", content: "<a href='https://www.koreanair.com/contents/footer/about-us/newsroom/list/korean-air-to-issue-environmental--social-and-governance-bonds' target='_blank'>Korean Air ESG Bond</a>" }
+                    { title: "Actual Use Case", content: "<a href='https://www.turkishairlines.com/fr-lb/press-room/news-press-release/turkish-airlines-secures-first-sustainability-linked-loan-for-two-airbus-a321neo-aircraft/' target='_blank'>Turkish Airlines – Airlines</a>" }
                 ]
             },
             {
@@ -502,7 +512,7 @@
                     { title: "Constraints", content: "<ul><li>Investment costs</li><li>Capacity constraints</li><li>Unclear reporting boundaries</li></ul>" },
                     { title: "EU Taxonomy", content: "<ul><li>6.20 Air transport ground handling operations</li><li>6.17 Low carbon airport infrastructure</li></ul>" },
                     { title: "Interpretation", content: "<ul><li>Requires clear system boundaries</li><li>Normalise (per passenger/m²) for comparability</li></ul>"},
-                    { title: "Actual Use Case", content: "<a href='https://flying-green.eurocontrol.int/#/decarb-fin/use-case-detailed-view?useCaseId=db9caf89-05ef-4650-8258-19feaea184ed' target='_blank'>Eurocontrol Use Case</a>" }
+                    { title: "Actual Use Case", content: "<a href='https://flying-green.eurocontrol.int/#/decarb-fin/use-case-detailed-view?useCaseId=db9caf89-05ef-4650-8258-19feaea184ed' target='_blank'>Schiphol Airport - Airports</a>" }
                 ]
             }
         ];
@@ -782,7 +792,6 @@
     </script>
 </body>
 </html>
-
 
 
 
