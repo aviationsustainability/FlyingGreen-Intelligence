@@ -375,52 +375,14 @@
         </div>
 
         <div class="filter-section">
-            <h3>EU Taxonomy Activity</h3>
+            <h3>EU Taxonomy Activity <span class="tooltip">i<span class="tooltiptext">The listed indicators are relevant to the EU Taxonomy activities below and support the assessment of the alignment with the Technical Screening Criteria for the activities below.</span></span></h3>
             <label class="checkbox-label"><input type="checkbox" name="taxonomy" value="6.18" onchange="applyFilters()"> 6.18 Leasing of aircraft</label>
             <label class="checkbox-label"><input type="checkbox" name="taxonomy" value="6.19" onchange="applyFilters()"> 6.19 Passenger & Freight air transport</label>
             <label class="checkbox-label"><input type="checkbox" name="taxonomy" value="6.20" onchange="applyFilters()"> 6.20 Air transport ground handling</label>
             <label class="checkbox-label"><input type="checkbox" name="taxonomy" value="6.17" onchange="applyFilters()"> 6.17 Low carbon airport infrastructure</label>
         </div>
 
-        <div class="filter-section">
-            <h3>Objectives</h3>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Climate mitigation" onchange="applyFilters()"> Climate mitigation</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Regulatory compliance" onchange="applyFilters()"> Regulatory compliance</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="System monitoring" onchange="applyFilters()"> System monitoring</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Climate efficiency" onchange="applyFilters()"> Climate efficiency</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Performance benchmarking" onchange="applyFilters()"> Performance benchmarking</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Project appraisal" onchange="applyFilters()"> Project appraisal</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Investment justification" onchange="applyFilters()"> Investment justification</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Technological advancement" onchange="applyFilters()"> Technological advancement</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Strategic planning" onchange="applyFilters()"> Strategic planning</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Cost reduction" onchange="applyFilters()"> Cost reduction</label>
-            <label class="checkbox-label"><input type="checkbox" name="objective" value="Infrastructure deployment" onchange="applyFilters()"> Infrastructure deployment</label>
-        </div>
-
-        <div class="filter-section">
-            <h3>Key Drivers</h3>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Infrastructure size" onchange="applyFilters()"> Infrastructure size</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Passenger throughput" onchange="applyFilters()"> Passenger throughput</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Climate conditions" onchange="applyFilters()"> Climate conditions</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Capital availability" onchange="applyFilters()"> Capital availability</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Fleet renewal strategy" onchange="applyFilters()"> Fleet renewal strategy</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Market demand" onchange="applyFilters()"> Market demand</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="System improvements" onchange="applyFilters()"> System improvements</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Carbon offsetting" onchange="applyFilters()"> Carbon offsetting</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Technology advancement" onchange="applyFilters()"> Technology advancement</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Fuel consumption" onchange="applyFilters()"> Fuel consumption</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Aircraft type" onchange="applyFilters()"> Aircraft type</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Fuel type" onchange="applyFilters()"> Fuel type</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Flight operations" onchange="applyFilters()"> Flight operations</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Distance" onchange="applyFilters()"> Distance</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Traffic volume" onchange="applyFilters()"> Traffic volume</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Policy incentives" onchange="applyFilters()"> Policy incentives</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Feedstock availability" onchange="applyFilters()"> Feedstock availability</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="SAF cost" onchange="applyFilters()"> SAF cost</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Supply chain maturity" onchange="applyFilters()"> Supply chain maturity</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Load factor" onchange="applyFilters()"> Load factor</label>
-            <label class="checkbox-label"><input type="checkbox" name="driver" value="Aircraft utilisation" onchange="applyFilters()"> Aircraft utilisation</label>
-        </div>
+        
     </div>
     <img src="https://i.postimg.cc/C1ZxMNVZ/eurocontrol-boxed-rgb.jpg" alt="Eurocontrol Logo" class="top-logo">
 
@@ -456,7 +418,7 @@
             {
                 icon: "co2_emissions_absolute.svg",
                 title: "CO2 Emissions Absolute",
-                front: { unit: "Metric tons of CO2 (tCO2)", stakeholders: ["Airlines", "Airports", "Lessors"], definition: "Total carbon dioxide (CO2) emissions generated by aviation activity over a defined period. Includes fuel combustion during flight operations." },
+                front: { unit: "Metric tons of CO2 (tCO2)", stakeholders: ["Airlines", "Airports", "Lessors"], definition: "Total carbon dioxide (CO2) emissions generated by aviation activity over a defined period. Calculated from fuel combustion during flight operations." },
                 back: [
                     { title: "Data Sources", content: "<ul><li>Fuel uplift data</li><li>Fuel burn models</li><li>Flight movement data</li><li>Aircraft performance databases</li><li>Emission factors inventories</li></ul>" },
                     { title: "Calculation Logic", content: "Fuel consumption multiplied by a standard emission factor (typically ~3.16 kg CO2 per kg of jet fuel), aggregated over the defined period." },
@@ -465,12 +427,12 @@
                     { title: "Constraints", content: "<ul><li>Penalises air traffic growth</li><li>Technology constraints</li><li>Policy constraints</li><li>Not suitable for benchmarking diverse business models</li></ul>" },
                     { title: "EU Taxonomy", content: "<ul><li>6.18 Leasing of aircraft</li><li>6.19 Passenger & Freight air transport</li><li>6.20 Air transport ground handling operations</li><li>6.17 Low carbon airport infrastructure</li></ul>" },
                     { title: "Interpretation", content: "Must be interpreted together with activity metrics. Please check boundaries of the system to account for proper emissions reporting (LTO vs. cruise)." },
-                    { title: "Actual Use Case", content: "<a href='https://flying-green.eurocontrol.int/#/decarb-fin/use-case-detailed-view?useCaseId=80a14b25-0e4a-45ee-bfb5-7207c4d07b2a' target='_blank'>Eurocontrol Use Case 1</a>" }
+                    { title: "Actual Use Case", content: "<a href='https://www.tuigroup.com/en/newsroom/news/tui-extends-27-billion-euros-credit-lines-with-banks-until-summer-2026-terms-tied-to-sustainability-targets-for-the-first-time' target='_blank'>TUIGROUP – Airlines</a><br><br><a href='https://www.internationalairportreview.com/news/187752/aena-signs-a-e2-billion-sustainability-linked-revolving-credit-facility/' target='_blank'>Aena – Airports</a>" }
                 ]
             },
             {
                 icon: "co2_intensity.svg",
-                title: "CO2 Intensity",
+                title: "Metric tones of CO2",
                 front: { unit: "Metric tones of CO2 per Available Seat-Kilometer (ASK)", stakeholders: ["Airlines"], definition: "CO2 emissions relative to transport output (available seat kilometers offered). Measures efficiency rather than total impact." },
                 back: [
                     { title: "Data Sources", content: "<ul><li>CO2 emissions data</li><li>Aircraft performance databases</li><li>Passenger traffic statistics</li></ul>" },
@@ -480,9 +442,8 @@
                     { title: "Constraints", content: "<ul><li>Ignores load factor</li><li>Route-length distortion</li><li>Not ideal for benchmarking diverse models</li></ul>" },
                     { title: "EU Taxonomy", content: "<ul><li>6.19 Passenger & Freight air transport</li></ul>" },
                     { title: "Interpretation", content: "<ul><li>Use for efficiency trends, not total climate impact</li><li>Ensure consistent denominator (ASK vs RPK)</li></ul>" },
-                    { title: "<span>Actual Use Case <span class='tooltip'>i<span class='tooltiptext'>There is no known use case for the indicator CO2/ASK. The use case below describes a relevant intensity indicator CO2/RPK.</span></span></span>", content: "<a href='https://flying-green.eurocontrol.int/#/decarb-fin/use-case-detailed-view?useCaseId=5addbd7b-49a5-45e3-a5dc-413bbb34ac6a' target='_blank'>Eurocontrol CO2/RPK</a>" }
+                    { title: "Actual Use Case", content: "<a href='https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fflying-green.eurocontrol.int%2F%23%2Fdecarb-fin%2Fuse-case-detailed-view%3FuseCaseId%3D5addbd7b-49a5-45e3-a5dc-413bbb34ac6a&data=05%7C02%7Cantonio.lazarovski%40eurocontrol.int%7C1a16bd06f2a345ad28fa08de74627a87%7C76f33c2059794408adf78b3c4be95e52%7C0%7C0%7C639076163474807606%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=hwAbSOb1yVhhyOtIClOtc5LKAq3eHG6ck%2BMv9Kb3nDs%3D&reserved=0' target='_blank'>TUIGROUP – Airlines</a><br><br><a href='https://www.internationalairportreview.com/news/187752/aena-signs-a-e2-billion-sustainability-linked-revolving-credit-facility/' target='_blank'>Aena – Airports</a>" }
                 ]
-            },
             {
                 icon: "saf_uptake.svg",
                 title: "SAF Uptake",
@@ -820,6 +781,7 @@
     </script>
 </body>
 </html>
+
 
 
 
