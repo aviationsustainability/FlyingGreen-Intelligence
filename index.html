@@ -500,7 +500,7 @@
             },
             {
                 icon: "co2_intensity.png",
-                title: "Metric tones of CO2",
+                title: "CO2 intensity",
                 front: { unit: "Metric tons of CO2 per Available Seat-Kilometer (ASK)", stakeholders: ["Airlines"], definition: "CO2 emissions relative to transport output (available seat kilometers offered). Measures efficiency rather than total impact." },
                 back: [
                     { title: "Data Sources", content: "<ul><li>CO2 emissions data</li><li>Aircraft performance databases</li><li>Passenger traffic statistics</li></ul>" },
@@ -634,7 +634,7 @@
                 // --- OR LOGIC: If it matches ANY active filter, return true immediately ---
 
                 // 2. Efficiency Switch
-                if (reqEfficiency && (item.title === "Metric tones of CO2" || item.title === "New-Gen Aircraft" || item.title === "CO2 Emissions Avoided")) return true;
+                if (reqEfficiency && (item.title === "CO2 intensity" || item.title === "New-Gen Aircraft" || item.title === "CO2 Emissions Avoided")) return true;
 
                 // 3. Energy Switch
                 if (reqEnergy && (item.title === "SAF Uptake" || item.title === "Energy Use (Airports)")) return true;
